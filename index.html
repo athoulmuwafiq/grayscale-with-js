@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Grayscale Dengan Javascript</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="/text/css" href="css/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="awesome/css/font-awesome.css">
+</head>
+<body>
+        <nav class="navbar navbar-light bg-light">
+            <a class="navbar-brand" >Grayscale Dengan Javascript</a>
+            <a>Atho'ul Muwafiq (16.1.03.02.0091)</a>
+        </nav>
+        <div class="container mb-5">
+            <div class="row mt-5">
+                        <div class="col-md-6">
+                        <div class="card">
+                          <div class="card-body">
+                            <div class="custom-file">
+                                <input accept="image/x-png,image/jpeg" type="file" class="custom-file-input" id="customFile" name="filename">
+                                <label class="custom-file-label" for="customFile">Choose file</label>
+                            </div>
+                            <div class="grupini mt-3 mb-3" style="display: none;">
+                                <button id="grayscale1" type="button" class="btn btn-primary btn-sm"><i class="fa fa-picture-o"></i> Grayscale 1</button>
+                                <button id="grayscale2" type="button" class="btn btn-primary btn-sm"><i class="fa fa-picture-o"></i> Grayscale 2</button>
+                                <button id="grayscale3" type="button" class="btn btn-primary btn-sm"><i class="fa fa-picture-o"></i> Grayscale 3</button>
+                                <button id="grayscale4" type="button" class="btn btn-primary btn-sm"><i class="fa fa-picture-o"></i> Grayscale 4</button>
+                            </div>
+                            <center><img src="" id="previewimg" style="display: none;"></center>
+                          </div>
+                        </div>
+                        </div>
+                        <div class="col-md-6">
+                        <div class="card">
+                          <div class="card-body">
+                            <p style="text-align: center;" class="card-text">Pilih gambar dan efek Grayscale terlebih dahulu.</p>
+                            <canvas id="canvas" width="500" height="350" style="display: none;"></canvas>
+                            <div id="dlbtn" style="display: none;">
+                              <center>
+                              <a id="download" download="hasilgrayscale.png">
+                                <button type="button" class="btn btn-success" onClick="download()"><i class="fa fa-download"></i> Download Gambar</button>
+                              </a>
+                              </center>
+                            </div>
+                          </div>
+                        </div>
+                        </div>
+        </div>
+<script src="js/jquery-3.3.1.slim.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    $('.custom-file-input').on('change',function(){
+      var fileName = document.getElementById("customFile").files[0].name;
+      $(this).next('.custom-file-label').addClass("selected").html(fileName);
+      readURL(this);
+    });
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function (e) {
+                $('.grupini').attr('style', 'display:block');
+                $('#previewimg').attr('src', e.target.result);
+                $('#previewimg').attr('style', 'max-width:100%;height:auto;margin-top:20px;border-radius:5px;display:block;');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+<script type="text/javascript">
+        function grayScale(context, canvas,no) {
+        var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+            var pixels  = imgData.data;
+            for (var i = 0, n = pixels.length; i < n; i += 4) {
+              if (no==1) {
+                var grayscale = pixels[i] * .144 + pixels[i+1] * .587 + pixels[i+2] * .299;
+              }else if (no==2) {
+                var grayscale = pixels[i] * .333 + pixels[i+1] * .333 + pixels[i+2] * .333;
+              }else if (no==3) {
+                var r= (pixels[i]*5)/10;var g= (pixels[i+1]*8)/10;var b= (pixels[i+2]*3)/10;
+                var grayscale = ((r+g+b) *10) /16;
+              }else if (no==4) {
+                var r= (pixels[i]*5)/10;var g= (pixels[i+1]*8)/10;var b= (pixels[i+2]*3)/10;
+                var grayscale = r*0.42+ g*0.32 +b*0.28;
+              }
+            pixels[i  ] = grayscale;        // red
+            pixels[i+1] = grayscale;        // green
+            pixels[i+2] = grayscale;        // blue
+        }
+        context.putImageData(imgData, 0, 0);
+        }
+
+      var canvas = document.getElementById('canvas');
+      var context = canvas.getContext('2d');
+      var imageObj = new Image();
+
+
+      var fitImageOn = function(canvas, imageObj) {
+          context.clearRect(0, 0, canvas.width, canvas.height);
+
+          var imageDimensionRatio = imageObj.width / imageObj.height;
+          var canvasDimensionRatio = canvas.width / canvas.height;
+          var renderableHeight, renderableWidth, xStart, yStart;
+          if(imageDimensionRatio < canvasDimensionRatio) {
+          renderableHeight = canvas.height;
+          renderableWidth = imageObj.width * (renderableHeight / imageObj.height);
+          xStart = (canvas.width - renderableWidth) / 2;
+          yStart = 0;
+          } else if(imageDimensionRatio > canvasDimensionRatio) {
+          renderableWidth = canvas.width
+          renderableHeight = imageObj.height * (renderableWidth / imageObj.width);
+          xStart = 0;
+          yStart = (canvas.height - renderableHeight) / 2;
+          } else {
+          renderableHeight = canvas.height;
+          renderableWidth = canvas.width;
+          xStart = 0;
+          yStart = 0;
+          }
+          context.drawImage(imageObj, xStart, yStart, renderableWidth, renderableHeight);
+          
+      };
+
+          $("#grayscale1").click(function(){
+            $('.card-text').text('Gambar Menggunakan Persamaan Grayscale 1');
+            $('.card-text').append('<br>grayscale = 0.114R+ 0.587G + 0.299B');
+            $('#canvas').show();
+            $('#dlbtn').show();
+            imageObj.src = $("#previewimg").attr('src');
+            fitImageOn(canvas, imageObj);
+            grayScale(context, canvas,1);
+          });
+          $("#grayscale2").click(function(){
+            $('.card-text').text('Gambar Menggunakan Persamaan Grayscale 2');
+            $('.card-text').append('<br>grayscale = 0.333R + 0.333G + 0.333B');
+            $('#canvas').show();
+            $('#dlbtn').show();
+            imageObj.src = $("#previewimg").attr('src');
+            fitImageOn(canvas, imageObj);
+            grayScale(context, canvas,2);
+          });
+          $("#grayscale3").click(function(){
+            $('.card-text').text('Gambar Menggunakan Persamaan Grayscale 3');
+            $('.card-text').append('<br>R = (R*5)/10, G = (G*8)/10, B = (B*3)/10<br>grayscale = ((R+G+B) *10) /16');
+            $('#canvas').show();
+            $('#dlbtn').show();
+            imageObj.src = $("#previewimg").attr('src');
+            fitImageOn(canvas, imageObj);
+            grayScale(context, canvas,3);
+          });
+          $("#grayscale4").click(function(){
+            $('.card-text').text('Gambar Menggunakan Persamaan Grayscale 4');
+            $('.card-text').append('<br>R = (R*5)/10, G = (G*8)/10, B = (B*3)/10<br>grayscale = R*0.42+ G*0.32 +B*0.28');
+            $('#canvas').show();
+            $('#dlbtn').show();
+            imageObj.src = $("#previewimg").attr('src');
+            fitImageOn(canvas, imageObj);
+            grayScale(context, canvas,4);
+          });
+</script>
+<script type="text/javascript">
+  function download() {
+  var download = document.getElementById("download");
+  var image = document.getElementById("canvas").toDataURL("image/png")
+      .replace("image/png", "image/octet-stream");
+  download.setAttribute("href", image);
+  }
+</script>
+</body>
+</html>
